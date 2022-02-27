@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from "react";
 import "./App.scss";
 
+interface TableManagerProps {
+  handed: number;
+  initialPlayers: string[];
+}
+
+const TableManager = ({ handed, initialPlayers }: TableManagerProps) => <></>;
+
 interface SetupFormProps {
-  callback: () => void;
+  callback: (handed: number, players: string[]) => void;
 }
 
 const SetupForm = ({ callback }: SetupFormProps) => {
   const [handed, setHanded] = useState(0);
+  const [players, setPlayers] = useState("");
 
   const submitForm = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    callback();
+    callback(handed, players.split("\n"));
   };
 
   useEffect(() => {
@@ -30,20 +38,15 @@ const SetupForm = ({ callback }: SetupFormProps) => {
           />
         </div>
         <label> Players, separated by newlines: </label>
-        <textarea />
+        <textarea
+          value={players}
+          onChange={(e) => setPlayers(e.target.value)}
+        />
         <button>Start Tournament</button>
       </form>
     </div>
   );
 };
-
-interface TableManagerProps {
-  initialPlayers: string[];
-}
-
-const TableManager = ({ initialPlayers }: TableManagerProps) => (
-  <>Table Manager will go here</>
-);
 
 function App() {
   enum State {
@@ -52,8 +55,12 @@ function App() {
   }
 
   const [state, setState] = useState(State.SETUP);
+  const [handed, setHanded] = useState(9);
+  const [players, setPlayers] = useState<string[]>([]);
 
-  const start = () => {
+  const start = (handed: number, players: string[]) => {
+    setHanded(handed);
+    setPlayers(players);
     setState(State.RUNNING);
   };
 
@@ -62,7 +69,7 @@ function App() {
       {state === State.SETUP ? (
         <SetupForm callback={start} />
       ) : (
-        <TableManager initialPlayers={[]} />
+        <TableManager handed={handed} initialPlayers={players} />
       )}
     </div>
   );
